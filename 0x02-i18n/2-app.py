@@ -36,7 +36,7 @@ def get_index() -> str:
     view function for root route
 
     Returns:
-        html: homepage    
+        html: homepage
     """
     return render_template('2-index.html')
 
