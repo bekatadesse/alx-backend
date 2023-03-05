@@ -25,11 +25,11 @@ def index():
     return render_template("2-index.html")
 
 
-@babel.localeselector
 def get_locale():
     """Gets best fmatch locale according to request"""
     return request.accept_languages.best_match(Config.LANGUAGES)
 
+babel.init_app(app, locale_selector=get_locale)
 
 if __name__ == "__main__":
     app.run(debug=True)
