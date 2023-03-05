@@ -1,43 +1,47 @@
 #!/usr/bin/env python3
-"""A Basic Flask app.
 """
+This module contains a Flask app that uses the Babel library to select the best
+supported language based on the user's browser preferences.
+"""
+
+from typing import List
+
+from babel import negotiate_locale
+from flask import Flask, request, g, render_template
 from flask_babel import Babel
-from flask import Flask, render_template, request
 
 
 class Config:
-    """Represents a Flask Babel configuration.
-    """
-    LANGUAGES = ["en", "fr"]
-    BABEL_DEFAULT_LOCALE = "en"
-    BABEL_DEFAULT_TIMEZONE = "UTC"
+    """Configuration class for the Flask app."""
+    LANGUAGES = ['en', 'fr']
+    BABEL_DEFAULT_LOCALE = 'en'
+    BABEL_DEFAULT_TIMEZONE = 'UTC'
 
 
 app = Flask(__name__)
 app.config.from_object(Config)
-app.url_map.strict_slashes = False
 babel = Babel(app)
 
 
 @babel.localeselector
 def get_locale() -> str:
-    """Retrieves the locale for a web page.
-    get best language match
+    """Select the best supported language based on the user's browser preferences.
 
     Returns:
-        str: best match
+        A two-letter language code (e.g., 'en', 'fr', 'es').
     """
-    return request.accept_languages.best_match(app.config["LANGUAGES"])
+    user_languages = [lang for lang, _ in request.accept_languages]
+
+    # Select the best supported language based on user's preferences
+    locale = negotiate_locale(user_languages, app.config['LANGUAGES'])
+
+    # If no supported language is found, return the default language
+    return locale or app.config['BABEL_DEFAULT_LOCALE']
 
 
 @app.route('/')
-def get_index() -> str:
-    """The home/index page.
-    view function for root route
-
-    Returns:
-        html: homepage
-    """
+def index() -> str:
+    """Render the index page."""
     return render_template('2-index.html')
 
 
